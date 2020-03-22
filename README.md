@@ -1,6 +1,8 @@
 # Covid.track - spread simulator 🦠
 
-![#WirVsVirus Hackathon Logo ](img/wirvsvirus.png)
+<p float="left">
+  <img src="img/wirvsvirus.png" width=30%/>
+</p>
 
 This project was used to create the simulations for a submission for the #WirVsVirus hackathon.
 As part of the Corona-Tracking challenge, we were conceptualizing an app, that can provide a "corona risk score" to you, which could alert you about potentially infection before you even have symptoms.
@@ -26,7 +28,7 @@ npm run dev
 
 ## What it means
 
-![Screenshot of the Simulator](img/screenshot.png)
+<img src="img/screenshot.png" width=60%/>
 
 The screenshot is taken in the middle of the simulation, when the symptoms and alerted boxes are checked. The dots are representing humans wandering around. The colors are indicating their healthy status.
 
