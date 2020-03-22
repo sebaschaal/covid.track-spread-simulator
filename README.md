@@ -1,6 +1,7 @@
 # Covid.track - spread simulator 🦠
 
 <p float="left">
+  <img src="img/phone.png" width=60%/>
   <img src="img/wirvsvirus.png" width=30%/>
 </p>
 
