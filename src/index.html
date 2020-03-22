@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Covid.track - Coronavirus Spread Simulator 🦠</title>
+
+  <meta name="description" content="COVID-19 Spread Simulator with different strategies. Open source.">
+  
+  <meta property="og:locale" content="en_EN" />
+  <meta property="og:title" content="Covid.track - Coronavirus Spread Simulator 🦠" />
+  <meta property="og:description" content="Covid.track - Coronavirus Spread Simulator including quick testing functionality" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link as="script" rel="preload" href="./p5.min.js" />
+  <link as="script" rel="modulepreload" href="./app.js" />
+  <link as="script" rel="modulepreload" href="./options.js" />
+  <link as="script" rel="modulepreload" href="./dom.js" />
+  <link as="script" rel="modulepreload" href="./Ball.js" />
+  <link as="script" rel="modulepreload" href="./results.js" />
+  <link as="script" rel="modulepreload" href="./collisions.js" />
+  
+  <script defer src="./p5.min.js"></script>
+  <script type="module" src="./app.js"></script>
+  <style>
+    html {
+      box-sizing: border-box;
+    }
+    
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    #share {
+      position: fixed;
+      bottom: 16px;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px 0 0px 5px;
+      background: rgba(0, 153, 255, 0.25);
+      z-index: 1;
+      text-decoration: none;
+      font-size: 12px;
+      padding: 4px 16px;
+      color: #000;
+    }
+
+    #share:hover {
+      background: rgba(0, 153, 255, 0.5);
+    }
+
+    body {
+      align-items: center;
+      background-image: radial-gradient(#D7D7D7 1px, transparent 1px), radial-gradient(#d7d7d7 1px, transparent 1px);
+      background-position: 0 0, 25px 25px;
+      background-size: 50px 50px;
+      display: flex;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      justify-content: center;
+      margin: 0 auto;
+      user-select: none;
+      width: 360px;
+    }
+
+    h1 {
+      font-size: 23px;
+      text-align: center;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    canvas {
+      border: 1px solid #eee;
+    }
+
+    #graph {
+      margin-bottom: 1px;
+      transform: scaleY(-1);
+    }
+
+    #count {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+
+    #count div {
+      margin-bottom: 16px;
+      padding: 0 10px;
+    }
+
+    #count span {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    footer {
+      padding-bottom: 8px;
+      color: #777;
+      font-size: 12px;
+    }
+
+    footer a {
+      color: #09f;
+      text-decoration: none;
+    }
+
+    form {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      align-items: center;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    #canvas {
+      margin: auto;
+      padding-bottom: 16px;
+      position: relative;
+    }
+
+    #replay {
+      align-items: center;
+      background: rgba(255, 255, 255, .85);
+      cursor: pointer;
+      display: flex;
+      height: 100%;
+      font-weight: 500;
+      font-size: 21px;
+      justify-content: center;
+      position: absolute;
+      width: 100%;
+    }
+
+    #death-count {
+      display: none;
+    }
+
+    #death-count.show {
+      display: block;
+    }
+
+    #testing-count {
+      display: none;
+    }
+
+    #testing-count.show {
+      display: block;
+    }
+
+    @media (min-width: 800px) {
+      body {
+       width: 800px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Covid.track - COVID-19 Spread Simulator 🦠</h1>
+  <main>
+    <header>
+      <form>
+        <label aria-label="Activate Quick Testing option" title="People get tested">
+          <input id="symptoms_box" type="checkbox">🤒 Stay home when symptomatic
+        </label>
+        <label aria-label="Activate Quick Testing option" title="People get tested">
+          <input id="alerted_box" type="checkbox">📱 Stay home when high-risk
+        </label>
+      </form>
+      <div id="count">
+        <div>Healthy<br />
+          <span id="well">0</span>
+        </div>
+        <div>Recovered<br />
+          <span id="recovered">0</span>
+        </div>
+        <div>Unknowingly Sick<br />
+          <span id="infected">0</span>
+        </div>
+        <div id="symptoms-count">Symptomatic Sick<br />
+          <span id="symptoms">0</span>
+        </div>
+        <div id="alerted-count">Alerted Sick<br />
+          <span id="alerted">0</span>
+        </div>
+        <div>Max Concurrently Sick<br />
+          <span id="max-concurrent-infected">0</span>
+        </div>
+      </div>
+
+      <svg id="graph" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="50" width="100%" aria-labelledby="Graph of virus spread" role="img">
+        <title>Graph of virus spread</title>
+      </svg>
+    </header>
+    <section>
+      <div id="canvas">
+        <div id="replay" style='display: none'>🔁 Run a new simulation</div>
+      </div>
+    </section>
+  </main>
+  
+  <footer>
+    By <a href='https://covid.track'>covid.track</a>
+  </footer>
+</body>
+</html>
